@@ -1,8 +1,12 @@
 import os
 import sqlite3
 from flask import Flask, render_template, request, redirect
+from init_db import init_db
 
 app = Flask(__name__)
+
+# Initialize the database and table if they don't exist
+init_db()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -79,7 +83,6 @@ def delete_record(id):
         conn = sqlite3.connect('pr.db')
         cursor = conn.cursor()
         cursor.execute('DELETE FROM pr WHERE id = ?', (id,))
-        # Reset the sequence to the current max ID to allow reusage of the latest ID
         cursor.execute("UPDATE sqlite_sequence SET seq = (SELECT MAX(id) FROM pr) WHERE name = 'pr'")
         conn.commit()
         conn.close()
